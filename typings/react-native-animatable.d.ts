@@ -118,6 +118,7 @@ export type Direction =
 
 interface AnimatableProperties<S extends {}> {
     animation?: Animation | string | CustomAnimation;
+    pulseScale?: number;
     duration?: number;
     delay?: number;
     direction?: Direction;
