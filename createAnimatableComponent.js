@@ -134,6 +134,7 @@ export default function createAnimatableComponent(WrappedComponent) {
 
     static propTypes = {
       animation: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+      pulseScale: PropTypes.number,
       duration: PropTypes.number,
       direction: PropTypes.oneOf([
         'normal',
@@ -175,6 +176,7 @@ export default function createAnimatableComponent(WrappedComponent) {
 
     static defaultProps = {
       animation: undefined,
+      pulseScale: undefined,
       delay: 0,
       direction: 'normal',
       duration: undefined,
@@ -314,6 +316,7 @@ export default function createAnimatableComponent(WrappedComponent) {
           onAnimationBegin();
           this.startAnimation(duration, 0, iterationDelay, endState =>
             this.props.onAnimationEnd(endState),
+            this.props.pulseScale
           );
           this.delayTimer = null;
         };
@@ -396,7 +399,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       }
     }
 
-    startAnimation(duration, iteration, iterationDelay, callback) {
+    startAnimation(duration, iteration, iterationDelay, callback, scale) {
       const { animationValue, compiledAnimation } = this.state;
       const { direction, iterationCount, useNativeDriver, isInteraction } = this.props;
       let easing = this.props.easing || compiledAnimation.easing || 'ease';
@@ -424,6 +427,9 @@ export default function createAnimatableComponent(WrappedComponent) {
         useNativeDriver,
         delay: iterationDelay || 0,
       };
+      if (scale) {
+        compiledAnimation['scale']['outputRange'][1] = scale
+      }
 
       Animated.timing(animationValue, config).start(endState => {
         currentIteration += 1;
@@ -437,6 +443,7 @@ export default function createAnimatableComponent(WrappedComponent) {
             currentIteration,
             iterationDelay,
             callback,
+            scale
           );
         } else if (callback) {
           callback(endState);
